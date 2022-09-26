@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    
+    <style>
+
+        #container{
+            height: 300px;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            border: 1px solid black;
+            /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; */
+        }
+        #container>div{
+            height: 80%;
+            width: 40%;
+            margin: auto;
+            /* border: 1px solid black; */
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        }
+
+        textarea{
+            width: 95%;
+            height: 80%;
+        }
+
+        </style>
+  </head>
+  <body>
+    <h1>Translator</h1>
+    <div id="container">
+
+    <div id="input">
+        <select id="inLang">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+        </select>
+        <!-- <button id="translate" onclick="Translate()">Translate</button> -->
+        <textarea id="inputText" name="text" oninput="debounce(main,1000)"></textarea>
+    </div>
+    <div id="output">
+    <select id="outLang">
+        <option value="hi">Hindi</option>
+        <option value="en">English</option>
+        
+    </div>
+    </select>
+    <p id="outputvalue"></p>
+    </div>
+  </body>
+</html>
+
+<script>
+
+    function read(id)
+    {
+        return document.querySelector(id).value;
+    }
+
+    async function Translate()
+    {
+        try{
+        let input=read("#inputText");
+        let inLan=read("#inLang");
+        let outLan=read("#outLang");
+        const res=await fetch("https://libretranslate.de/translate",{
+            method:"POST",
+            body:JSON.stringify({
+                q:input,
+                source:inLan,
+                target:outLan,
+                format:"text"
+            }),
+            headers:{"Content-Type":"application/json"}
+        });
+
+        console.log(res);
+        const {translatedText}=await res.json();
+
+        console.log(translatedText);
+        return translatedText;
+        
+       
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
+
+    }
+
+    async function main()
+    {
+        let data=await(Translate());
+        if(data==undefined)
+        {
+            return false;
+        }
+        else{
+            document.querySelector("#outputvalue").innerText=null;
+            document.querySelector("#outputvalue").innerText=data;
+        }
+        
+    }
+    
+    let id;
+
+    function debounce(func,delay)
+    {
+        if(id)
+        {
+        clearTimeout(id);
+        }
+        id=setTimeout(function(){
+            func();
+        },delay)
+
+    }
+
+    
+</script>
